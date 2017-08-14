@@ -1,0 +1,25 @@
+body{
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+}
+
+#lander{
+	height: 10vmin;
+	width: 10vmin;
+	background-color: purple;
+	position: absolute;
+	left: 300px;
+	top: 0%;
+}
+
+#lander.primaryThrust::after{
+	content: '';
+	height: 5vmin;
+	width: 10vmin;
+	position: absolute;
+	display: inline-block;
+	top: 100%;
+	background-color: red;
+}
