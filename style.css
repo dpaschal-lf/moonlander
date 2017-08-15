@@ -13,7 +13,32 @@ body{
 	left: 300px;
 	top: 0%;
 }
+.leftThrust,.rightThrust{
+    position: absolute;
+    background-color: red;
+    height: 0;
+    width: 0;
+    border-top: 3vmin solid red;
+    border-right: 3vmin solid transparent;
+    border-left: 3vmin solid transparent;
+    background-color: transparent;
 
+}
+.leftThrust {
+    left: 0;
+    top: 50%;
+    transform: translate(-74%, -50%) rotateZ(90deg);
+    display: none;
+}
+.rightThrust {
+    left: 100%;
+    top: 50%;
+    transform: translate(-25%, -50%) rotateZ(-90deg);
+    display: none;
+}
+.leftThrust.active, .rightThrust.active{
+	display: inline-block;
+}
 #lander.primaryThrust::after{
 	content: '';
 	height: 5vmin;
@@ -23,3 +48,42 @@ body{
 	top: 100%;
 	background-color: red;
 }
+
+#ground{
+	position: absolute;
+	left: 0;
+	bottom: 0%;
+	height: 20vh;
+	width: 100vw;
+	background-color: grey;
+
+}
+#velocity{
+	position: absolute;
+	right: 0;
+	top: 0;
+
+}
+
+#fuel { 
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100px;
+	width: 30px;
+	background-color: grey;
+}
+#fuel > div{
+	height: 100%;
+	position: absolute;
+	bottom: 0;
+	background-color: red;
+	width: 100%;
+}
+
+
+
+
+
+
+
