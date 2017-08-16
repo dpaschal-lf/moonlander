@@ -80,10 +80,18 @@ function MoonLanderGame(){
 		this.fuelPerInterval = null;
 		this.gravityPerInterval=null;
 		this.domElement = null;
+		this.shipAngle = 0;
+		this.attitudeDegreesPerSecond = 180;
+		this.attitudeDegreesPerInterval = null;
 		this.thrustForcePerInterval = 0;
+		this.radianConversionConstant = Math.PI / 180;
 		this.defaultThrustForce = 2.3;
 		this.defaultAttitudeThrust = .5;
 		this.attitudeThrustPerIntervalValue=null;
+		this.thrustDeltaPerInterval = {
+			x: null,
+			y: null
+		}
 		this.attitudeThrustPerInterval = {
 			left: 0,
 			right: 0
@@ -100,19 +108,32 @@ function MoonLanderGame(){
 		this.init = function(gravity){
 			this.gravityPerInterval = gravity;
 			this.position = this.domElement.position();
+			this.convertUnitsPerSecondToPerInterval();
+		}
+		this.convertUnitsPerSecondToPerInterval = function(){
 			this.defaultThrustForcePerInterval = this.defaultThrustForce / this.parent.numberOfIntervals;
 			this.attitudeThrustPerIntervalValue = this.defaultAttitudeThrust / this.parent.numberOfIntervals;
 			this.fuelPerInterval = this.fuelPerSecond / this.parent.numberOfIntervals;
+			this.attitudeDegreesPerInterval = this.attitudeDegreesPerSecond / this.parent.numberOfIntervals;			
 		}
 		this.thrustLeft = function(){
 			this.attitudeThrustPerInterval.right = this.attitudeThrustPerInterval.right ? 0 : this.attitudeThrustPerIntervalValue;
+			this.shipAngle += this.attitudeDegreesPerInterval;
 			$("#lander > .leftThrust").toggleClass('active');
+			this.changeThrustVector();
 		}
 		this.thrustRight = function(){
 			this.attitudeThrustPerInterval.left = this.attitudeThrustPerInterval.left ? 0 : this.attitudeThrustPerIntervalValue;
+			this.shipAngle -= this.attitudeDegreesPerInterval;
 			$("#lander > .rightThrust").toggleClass('active');
+			this.changeThrustVector();
 		}
-
+		this.changeThrustVector = function(){
+			var radians = this.shipAngle * this.radianConversionConstant;
+			this.domElement.css('transform',`rotateZ(${this.shipAngle}deg)`);
+			this.thrustDeltaPerInterval.x = Math.cos(radians)*this.thrustForcePerInterval;
+			this.thrustDeltaPerInterval.y = Math.sin(radians)*this.thrustForcePerInterval;
+		}
 		this.activateThrust = function(){
 			this.thrustForcePerInterval = this.defaultThrustForcePerInterval;
 			this.domElement.addClass('primaryThrust');
@@ -121,7 +142,6 @@ function MoonLanderGame(){
 			$("#fuel > div").css('height',(100*(this.fuel / this.maxFuel)) + '%');
 		}
 		this.reduceFuel = function(){
-			debugger;
 			this.fuel -= this.fuelPerInterval * this.thrustForcePerInterval;
 			if(this.fuel<=0){
 				this.activateThrust = function(){};
@@ -146,10 +166,11 @@ function MoonLanderGame(){
 			return this.domElement;
 		}
 		this.applyAttitudeThrust = function(){
-			this.momentum.x += this.attitudeThrustPerInterval.right - this.attitudeThrustPerInterval.left;
+			this.momentum.x += this.attitudeThrustPerInterval.right - this.attitudeThrustPerInterval.left + this.thrustDeltaPerInterval.x;
 		}
 		this.applyGravity = function(){
-			this.momentum.y += this.gravityPerInterval - this.thrustForcePerInterval;
+			this.momentum.y += this.gravityPerInterval - this.thrustDeltaPerInterval.y;
+			//this.momentum.y += this.gravityPerInterval - this.thrustForcePerInterval;
 		}
 		this.detectCollision = function(){
 			
