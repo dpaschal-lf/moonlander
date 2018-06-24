@@ -74,7 +74,7 @@ function MoonLanderGame(){
 	}
 	function Lander(parent){
 		this.parent = parent;
-		this.maxFuel = 1000;
+		this.maxFuel = 250;
 		this.fuel = this.maxFuel;
 		this.fuelPerSecond = 2000;
 		this.fuelPerInterval = null;
