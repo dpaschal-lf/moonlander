@@ -19,9 +19,19 @@ function MoonLanderGame(){
 	this.init = function(){
 		var shipElement = this.ship.create();
 		$("body").append(shipElement);
+		$("body").append( this.createPlatform());
 		this.ship.init(this.gravityPerInterval);
 		this.applyHandlers();
 		this.startHeartbeat();
+	}
+	this.createPlatform = function(){
+		this.platform = $('<div>',{
+			'id': 'platform',
+			css: {
+				left: Math.floor(Math.random() * 60) + 20 + '%'
+			}
+		});
+		return this.platform;
 	}
 	this.applyHandlers = function(){
 		$('body').on('keydown',this.handleKeydown.bind(this));
@@ -61,9 +71,14 @@ function MoonLanderGame(){
 		this.updateStats();
 	}
 	this.handleCollision = function(velocity){
-		if(velocity > .5){
-			alert('KABOOM!');
+		if(velocity > .75){
+			this.landerExplode();
 		}
+		this.gameOver();
+		
+	}
+	this.landerExplode = function(){
+		alert('KABOOM!')
 		this.gameOver();
 	}
 	this.updateStats = function(){
@@ -74,7 +89,7 @@ function MoonLanderGame(){
 	}
 	function Lander(parent){
 		this.parent = parent;
-		this.maxFuel = 250;
+		this.maxFuel = 500;
 		this.fuel = this.maxFuel;
 		this.fuelPerSecond = 2000;
 		this.fuelPerInterval = null;
@@ -121,7 +136,6 @@ function MoonLanderGame(){
 			$("#fuel > div").css('height',(100*(this.fuel / this.maxFuel)) + '%');
 		}
 		this.reduceFuel = function(){
-			debugger;
 			this.fuel -= this.fuelPerInterval * this.thrustForcePerInterval;
 			if(this.fuel<=0){
 				this.activateThrust = function(){};
@@ -153,18 +167,37 @@ function MoonLanderGame(){
 		}
 		this.detectCollision = function(){
 			
-			var landerTop = this.position.top;
-			var landerBottom = landerTop + this.domElement.height();
-
 			var groundElement = $("#ground");
-			var groundPosition = groundElement.position();
-			var groundTop = groundPosition.top;
-			
-			if(landerBottom >= groundTop){
+			var platform = $("#platform");
+
+			if(this.detectCollisionBetweenElements(groundElement, this.domElement)){
+				this.parent.landerExplode();
+			} else if( this.detectCollisionBetweenElements(platform, this.domElement) ){
+				console.log('platform')
 				this.parent.handleCollision(this.momentum.y);
 			}
-
-
+		}
+		this.detectCollisionBetweenElements = function(e1, e2){
+			var e1Bounds = this.getBounds(e1);
+			var e2Bounds = this.getBounds(e2);
+			if( (e1Bounds.right < e2Bounds.left 
+				||
+				e1Bounds.bottom < e2Bounds.top
+				||
+				e2Bounds.right < e1Bounds.left
+				||
+				e2Bounds.bottom < e1Bounds.top)){
+				return false;
+			} else {
+				return true;
+			}
+		}
+		this.getBounds = function(element){
+			element = $(element);
+			var elementBounds = element.position();
+			elementBounds.bottom = elementBounds.top + element.height();
+			elementBounds.right = elementBounds.left + element.width();
+			return elementBounds;
 		}
 
 		this.move = function(){

@@ -13,6 +13,13 @@ body{
 	left: 300px;
 	top: 0%;
 }
+#platform{
+	width: 20vmin;
+	background-color: black;
+	position: absolute;
+	bottom: 0;
+	height: 22vh;
+}
 .leftThrust,.rightThrust{
     position: absolute;
     background-color: red;
